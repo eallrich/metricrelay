@@ -1,3 +1,4 @@
+import importlib
 import logging
 import re
 import SocketServer
@@ -40,7 +41,10 @@ def _init():
         },
     }
 
-    # FIXME Initialize backends. If none configured, use default
+    m.backends = []
+    for backend in defaults.backends:
+        b = importlib.import_module(backend)
+        m.backends.append(b)
 
 
 class Statsd(SocketServer.BaseRequestHandler):
