@@ -16,35 +16,31 @@ except ImportError as exc:
 
 
 def _init():
-    # For convenience
-    d = defaults
-    m = metrics
+    metrics.lock = threading.RLock()
 
-    m.lock = threading.RLock()
+    metrics.counters       = {}
+    metrics.counter_rates  = {}
+    metrics.gauges         = {}
+    metrics.sets           = {}
+    metrics.timers         = {}
+    metrics.timer_counters = {}
+    metrics.timer_data     = {}
 
-    m.counters       = {}
-    m.counter_rates  = {}
-    m.gauges         = {}
-    m.sets           = {}
-    m.timers         = {}
-    m.timer_counters = {}
-    m.timer_data     = {}
+    # Set to zero so we can increment
+    metrics.counters[defaults.bad_lines_seen] = 0
+    metrics.counters[defaults.packets_received] = 0
 
-    # Set so we can increment
-    m.counters[d.bad_lines_seen] = 0
-    m.counters[d.packets_received] = 0
-
-    m.stats = {
+    metrics.stats = {
         'messages': {
             'last_msg_seen': util.ts(),
             'bad_lines_seen': 0,
         },
     }
 
-    m.backends = []
+    metrics.backends = []
     for backend in defaults.backends:
         b = importlib.import_module(backend)
-        m.backends.append(b)
+        metrics.backends.append(b)
 
 
 class Statsd(SocketServer.BaseRequestHandler):
