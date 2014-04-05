@@ -6,6 +6,21 @@ backends = (
 flush_interval = 10000 # milliseconds
 
 
+# Deleting metrics after flush
+# ----------------------------
+delete_idle_stats = False
+delete_counters   = False
+delete_timers     = False
+delete_sets       = False
+delete_gauges     = False
+
+
+# Timer statistics
+# ----------------
+percent_threshold = [90,]
+histogram = []
+
+
 # stat names
 # ----------
 prefix_stats = "statsd"
