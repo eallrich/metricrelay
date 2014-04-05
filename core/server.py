@@ -22,10 +22,12 @@ def _init():
     m.lock = threading.RLock()
 
     m.counters       = {}
+    m.counter_rates  = {}
     m.gauges         = {}
     m.sets           = {}
     m.timers         = {}
     m.timer_counters = {}
+    m.timer_data     = {}
 
     # Set so we can increment
     m.counters[d.bad_lines_seen] = 0
@@ -45,6 +47,9 @@ class Statsd(SocketServer.BaseRequestHandler):
     def handle(self):
         # For convenience
         m = metrics
+
+        with m.lock:
+            m.counters[defaults.packets_received] += 1
 
         data = self.request[0].rstrip('\n')
 
@@ -114,5 +119,6 @@ def start(host='127.0.0.1', port=8125):
     try:
         server.serve_forever()
     except KeyboardInterrupt:
+        log.info("Shutting down")
         server.shutdown()
         flush.stop()
