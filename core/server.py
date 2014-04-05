@@ -3,7 +3,7 @@ import re
 import SocketServer
 import threading
 
-from . import defaults, metrics, util
+from . import defaults, flush, metrics, util
 
 logging.basicConfig(**defaults.logging)
 log = logging.getLogger(__name__)
@@ -108,9 +108,11 @@ class Statsd(SocketServer.BaseRequestHandler):
 
 def start(host='127.0.0.1', port=8125):
     _init()
+    flush.start()
     log.info("Listening at %s:%d" % (host, port))
     server = SocketServer.UDPServer((host, port), Statsd)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
         server.shutdown()
+        flush.stop()
