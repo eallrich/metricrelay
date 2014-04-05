@@ -4,15 +4,10 @@ import re
 import SocketServer
 import threading
 
-from . import defaults, flush, metrics, util
+from . import flush, metrics, settings, util
 
-logging.basicConfig(**defaults.logging)
+logging.basicConfig(**settings.logging)
 log = logging.getLogger(__name__)
-
-try:
-    from . import settings
-except ImportError as exc:
-    log.warn("No local settings; proceeding with defaults.")
 
 
 def _init():
@@ -27,8 +22,8 @@ def _init():
     metrics.timer_data     = {}
 
     # Set to zero so we can increment
-    metrics.counters[defaults.bad_lines_seen] = 0
-    metrics.counters[defaults.packets_received] = 0
+    metrics.counters[settings.bad_lines_seen] = 0
+    metrics.counters[settings.packets_received] = 0
 
     metrics.stats = {
         'messages': {
@@ -38,7 +33,7 @@ def _init():
     }
 
     metrics.backends = []
-    for backend in defaults.backends:
+    for backend in settings.backends:
         b = importlib.import_module(backend)
         metrics.backends.append(b)
 
@@ -49,7 +44,7 @@ class Statsd(SocketServer.BaseRequestHandler):
         m = metrics
 
         with m.lock:
-            m.counters[defaults.packets_received] += 1
+            m.counters[settings.packets_received] += 1
 
         data = self.request[0].rstrip('\n')
 

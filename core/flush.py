@@ -3,13 +3,13 @@ import threading
 
 from . import (
     backends,
-    defaults,
     metrics,
+    settings,
     statistics,
     util,
 )
 
-logging.basicConfig(**defaults.logging)
+logging.basicConfig(**settings.logging)
 log = logging.getLogger(__name__)
 
 
@@ -18,7 +18,7 @@ def _clear_metrics():
 
     Requires the caller to get the metrics.lock first."""
     for key in metrics.counters:
-        if defaults.delete_counters:
+        if settings.delete_counters:
             # Just reset built-in counters to zero
             if "packets_received" in key or "bad_lines_seen" in key:
                 metrics.counters[key] = 0
@@ -28,7 +28,7 @@ def _clear_metrics():
             metrics.counters[key] = 0
 
     for key in metrics.timers:
-        if defaults.delete_timers:
+        if settings.delete_timers:
             del metrics.timers[key]
             del metrics.timer_counters[key]
         else:
@@ -36,13 +36,13 @@ def _clear_metrics():
             metrics.timer_counters[key] = 0
 
     for key in metrics.sets:
-        if defaults.delete_sets:
+        if settings.delete_sets:
             del metrics.sets[key]
         else:
             metrics.sets[key] = set()
 
     # Gauges keep reporting previous values unless configured otherwise
-    if defaults.delete_gauges:
+    if settings.delete_gauges:
         for key in metrics.gauges:
             del metrics.gauges[key]
 
@@ -61,9 +61,9 @@ def _flush():
     log.debug("Flushing metrics")
     now = util.ts()
     if hasattr(metrics, 'old_timestamp'):
-        lag = now - metrics.old_timestamp - (defaults.flush_interval / 1000)
+        lag = now - metrics.old_timestamp - (settings.flush_interval / 1000)
         with metrics.lock:
-            metrics.gauges[defaults.timestamp_lag_namespace] = lag
+            metrics.gauges[settings.timestamp_lag_namespace] = lag
     # Only flush writes to 'old_timestamp' so we're not going to lock
     metrics.old_timestamp = now
 
@@ -76,13 +76,13 @@ def _flush():
             'sets':              metrics.sets.copy(),
             'counter_rates':     metrics.counter_rates.copy(),
             'timer_data':        metrics.timer_data.copy(),
-            'percent_threshold': defaults.percent_threshold,
-            'histogram':         defaults.histogram,
+            'percent_threshold': settings.percent_threshold,
+            'histogram':         settings.histogram,
         }
 
         _clear_metrics()
 
-    statistics.process_metrics(data, defaults.flush_interval, _processed)
+    statistics.process_metrics(data, settings.flush_interval, _processed)
 
 
 def _run():
@@ -96,7 +96,7 @@ def _run():
 
 def start():
     """Sets up and starts the flush timer"""
-    metrics.timer = threading.Timer(defaults.flush_interval / 1000, _run)
+    metrics.timer = threading.Timer(settings.flush_interval / 1000, _run)
     metrics.timer.start()
 
 
