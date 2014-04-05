@@ -1,7 +1,13 @@
 import logging
 import threading
 
-from . import defaults, metrics, statistics, util
+from . import (
+    backends,
+    defaults,
+    metrics,
+    statistics,
+    util,
+)
 
 logging.basicConfig(**defaults.logging)
 log = logging.getLogger(__name__)
@@ -44,8 +50,10 @@ def _clear_metrics():
 def _processed(data):
     log.debug(data)
 
-    for backend in metrics.backends:
-        backend.flush(data)
+    t = threading.Thread(None, backends.flush, args=(metrics.backends, data))
+    t.start()
+
+    log.debug("Backend thread spawned, flush completed")
 
 
 def _flush():
@@ -93,7 +101,7 @@ def start():
 
 
 def stop():
-    """Stops a running flush timer"""
+    """Stops a running flush timer and flushes metrics one last time"""
     metrics.timer.cancel()
     # One final flush
     _flush()
