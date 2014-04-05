@@ -42,8 +42,10 @@ def _clear_metrics():
 
 
 def _processed(data):
-    log.debug("Processed callback activated")
     log.debug(data)
+
+    for backend in metrics.backends:
+        backend.flush(data)
 
 
 def _flush():
