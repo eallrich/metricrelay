@@ -50,7 +50,8 @@ def _clear_metrics():
 def _processed(data):
     log.debug(data)
 
-    t = threading.Thread(None, backends.flush, args=(metrics.backends, data))
+    args = (metrics.backends, data)
+    t = threading.Thread(None, backends.flush, "backend_flush", args=args)
     t.start()
 
     log.debug("Backend thread spawned, flush completed")
