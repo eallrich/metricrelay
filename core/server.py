@@ -1,6 +1,7 @@
 import logging
 import re
 import SocketServer
+import threading
 
 from . import defaults, metrics, util
 
@@ -17,6 +18,8 @@ def _init():
     # For convenience
     d = defaults
     m = metrics
+
+    m.lock = threading.RLock()
 
     m.counters       = {}
     m.gauges         = {}
@@ -45,7 +48,6 @@ class Statsd(SocketServer.BaseRequestHandler):
 
         data = self.request[0].rstrip('\n')
 
-        # TODO Get metrics lock
         for metric in data.split('\n'):
             if len(metric) == 0:
                 continue
@@ -77,26 +79,31 @@ class Statsd(SocketServer.BaseRequestHandler):
             # TODO if key_flush_interval > 0, increment key_counter
 
             if metric_type == "ms":
-                m.timers.setdefault(key, [])
-                m.timers[key].append(float(value))
+                with m.lock:
+                    m.timers.setdefault(key, [])
+                    m.timers[key].append(float(value))
 
-                m.timer_counters.setdefault(key, 0)
-                m.timer_counters[key] += 1 / sample_rate
+                    m.timer_counters.setdefault(key, 0)
+                    m.timer_counters[key] += 1 / sample_rate
             elif metric_type == "g":
-                if key in m.gauges and re.match(r"[-+]", value):
-                    log.debug("Changing gauge by %s" % value)
-                    m.gauges[key] += float(value)
-                else:
-                    log.debug("Setting gauge to %s" % value)
-                    m.gauges[key] = float(value)
+                with m.lock:
+                    if key in m.gauges and re.match(r"[-+]", value):
+                        log.debug("Changing gauge by %s" % value)
+                        m.gauges[key] += float(value)
+                    else:
+                        log.debug("Setting gauge to %s" % value)
+                        m.gauges[key] = float(value)
             elif metric_type == "s":
-                m.sets.setdefault(key, set())
-                m.sets[key].add(value)
+                with m.lock:
+                    m.sets.setdefault(key, set())
+                    m.sets[key].add(value)
             else:
-                m.counters.setdefault(key, 0)
-                m.counters[key] += float(value) * (1 / sample_rate)
+                with m.lock:
+                    m.counters.setdefault(key, 0)
+                    m.counters[key] += float(value) * (1 / sample_rate)
 
-        m.stats['messages']['last_msg_seen'] = util.ts()
+        with m.lock:
+            m.stats['messages']['last_msg_seen'] = util.ts()
 
 
 def start(host='127.0.0.1', port=8125):
