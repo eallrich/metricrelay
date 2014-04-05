@@ -8,3 +8,6 @@ local/
 
 # Generated files
 *.swp
+
+# User-created files
+core/settings.py
