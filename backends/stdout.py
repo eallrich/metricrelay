@@ -1,3 +1,7 @@
+import pprint
+
+from core import util
+
 def flush(metrics):
-    for m in metrics:
-        print("m")
+    print("Flushing stats at %d" % util.ts())
+    pprint.pprint(metrics)
