@@ -31,6 +31,6 @@ timestamp_lag_namespace = prefix_stats + ".timestamp_lag"
 
 logging = {
     'format':  '%(asctime)s | [%(levelname)s] %(message)s',
-    'level':   'DEBUG',
+    'level':   'INFO',
     'datefmt': '%Y-%m-%dT%H:%M:%S',
 }
