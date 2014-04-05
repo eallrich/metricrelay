@@ -1,41 +1,11 @@
-import importlib
 import logging
 import re
 import SocketServer
-import threading
 
 from . import flush, metrics, settings, util
 
 logging.basicConfig(**settings.logging)
 log = logging.getLogger(__name__)
-
-
-def _init():
-    metrics.lock = threading.RLock()
-
-    metrics.counters       = {}
-    metrics.counter_rates  = {}
-    metrics.gauges         = {}
-    metrics.sets           = {}
-    metrics.timers         = {}
-    metrics.timer_counters = {}
-    metrics.timer_data     = {}
-
-    # Set to zero so we can increment
-    metrics.counters[settings.bad_lines_seen] = 0
-    metrics.counters[settings.packets_received] = 0
-
-    metrics.stats = {
-        'messages': {
-            'last_msg_seen': util.ts(),
-            'bad_lines_seen': 0,
-        },
-    }
-
-    metrics.backends = []
-    for backend in settings.backends:
-        b = importlib.import_module(backend)
-        metrics.backends.append(b)
 
 
 class Statsd(SocketServer.BaseRequestHandler):
@@ -107,7 +77,6 @@ class Statsd(SocketServer.BaseRequestHandler):
 
 
 def start(host='127.0.0.1', port=8125):
-    _init()
     flush.start()
     log.info("Listening at %s:%d" % (host, port))
     server = SocketServer.UDPServer((host, port), Statsd)
