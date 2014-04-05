@@ -56,8 +56,8 @@ def _flush():
         lag = now - metrics.old_timestamp - (defaults.flush_interval / 1000)
         with metrics.lock:
             metrics.gauges[defaults.timestamp_lag_namespace] = lag
-        # Only flush writes to 'old_timestamp' so we're not going to lock
-        metrics.old_timestamp = now
+    # Only flush writes to 'old_timestamp' so we're not going to lock
+    metrics.old_timestamp = now
 
     with metrics.lock:
         data = {
