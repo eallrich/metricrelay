@@ -1,0 +1,2 @@
+requests==2.2.1
+statsd==2.1.2
