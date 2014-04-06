@@ -21,8 +21,17 @@ percent_threshold = [90,]
 histogram = []
 
 
-# stat names
-# ----------
+# Stat prefixes
+# -------------
+global_prefix = 'stats'
+prefix_counter = 'counters'
+prefix_timer = 'timers'
+prefix_gauge = 'gauges'
+prefix_set = 'sets'
+
+
+# self-reported stat names
+# ------------------------
 prefix_stats = "statsd"
 bad_lines_seen          = prefix_stats + ".bad_lines_seen"
 packets_received        = prefix_stats + ".packets_received"
