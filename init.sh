@@ -4,4 +4,7 @@ virtualenv .
 
 echo "export PYTHONPATH=$(pwd)" >> bin/activate
 
-echo "Complete"
+source bin/activate
+pip install -r requirements.txt
+
+echo "Complete. Don't forget to run '. bin/activate'"
