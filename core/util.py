@@ -1,4 +1,3 @@
-import platform
 import re
 import time
 
@@ -13,15 +12,12 @@ def clean(key):
     return key
 
 
-host = platform.node()
 def ns(*args):
-    """Short for "namespace," returns a key prefixed by the host's name.
+    """Short for "namespace," returns a key composed of the given strings.
 
-    Example: ns('foo', 'bar') yields 'host.foo.bar'
+    Example: ns('foo', 'bar') yields 'foo.bar'
     """
-    parts = [host,]
-    parts.extend(args)
-    return '.'.join(parts)
+    return '.'.join(args)
 
 
 def ts():
