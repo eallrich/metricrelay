@@ -16,8 +16,11 @@ def ns(*args):
     """Short for "namespace," returns a key composed of the given strings.
 
     Example: ns('foo', 'bar') yields 'foo.bar'
+
+    Empty strings and Falsy values are ignored:
+    ns('foo', '', 'baz', None) yields 'foo.baz'
     """
-    return '.'.join(args)
+    return '.'.join([s for s in args if s])
 
 
 def ts():
