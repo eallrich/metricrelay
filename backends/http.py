@@ -92,7 +92,7 @@ def flush(metrics):
     
     payload = json.dumps(formatted)
 
-    with statsd.timer(util.ns('flush', 'transmit')):
+    with statsd.timer(util.ns('flush', 'transmit', settings.suffix_stats)):
         for url in settings.http_servers:
             try:
                 r = requests.post(url, data=payload, headers=headers, timeout=10)
