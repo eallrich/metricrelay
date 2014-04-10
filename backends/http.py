@@ -95,7 +95,7 @@ def flush(metrics):
     with statsd.timer(util.ns('flush', 'transmit')):
         for url in settings.http_servers:
             try:
-                r = requests.post(url, data=payload, headers=headers)
+                r = requests.post(url, data=payload, headers=headers, timeout=10)
                 if r.status_code != 201:
                     msg = "%s returned status %d" % (url, r.status_code)
                     log.error(msg + "; text:")
