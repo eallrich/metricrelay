@@ -2,6 +2,8 @@
 import math
 import time
 
+from . import settings, util
+
 def process_metrics(metrics, flush_interval, flush_callback):
     """Generates statistics on a metrics collection and calls the callback.
 
@@ -115,7 +117,8 @@ def process_metrics(metrics, flush_interval, flush_callback):
 
         timer_data[key] = current_timer_data
 
-    statsd_metrics["processing_time"] = (time.time() * 1000) - starttime
+    metric_name = util.ns("processing_time", settings.suffix_stats)
+    statsd_metrics[metric_name] = (time.time() * 1000) - starttime
 
     # Save the generated metrics data
     metrics['counter_rates'] = counter_rates
