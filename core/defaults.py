@@ -1,3 +1,6 @@
+import platform
+hostname = platform.node().replace('.', '_')
+
 backends = (
     'backends.stdout',
 )
@@ -33,9 +36,10 @@ prefix_set = 'sets'
 # self-reported stat names
 # ------------------------
 prefix_stats = "statsd"
-bad_lines_seen          = prefix_stats + ".bad_lines_seen"
-packets_received        = prefix_stats + ".packets_received"
-timestamp_lag_namespace = prefix_stats + ".timestamp_lag"
+suffix_stats = ".%s" % hostname
+bad_lines_seen          = prefix_stats + ".bad_lines_seen" + suffix_stats
+packets_received        = prefix_stats + ".packets_received" + suffix_stats
+timestamp_lag_namespace = prefix_stats + ".timestamp_lag" + suffix_stats
 
 
 logging = {
