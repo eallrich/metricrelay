@@ -76,7 +76,7 @@ class Statsd(SocketServer.BaseRequestHandler):
             m.stats['messages']['last_msg_seen'] = util.ts()
 
 
-def start(host='127.0.0.1', port=8125):
+def start(host='127.0.0.1', port=48125):
     flush.start()
     log.info("Listening at %s:%d" % (host, port))
     server = SocketServer.UDPServer((host, port), Statsd)
