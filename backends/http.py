@@ -18,7 +18,7 @@ log = logging.getLogger(__name__)
 # Restrict overly-verbose logging
 logging.getLogger("requests").setLevel(logging.WARNING)
 
-statsd = StatsClient(prefix=util.ns(settings.prefix_stats, 'backend', 'http'))
+statsd = StatsClient('localhost', 48125, prefix=util.ns(settings.prefix_stats, 'backend', 'http'))
 
 excluded = (
     'histogram',
