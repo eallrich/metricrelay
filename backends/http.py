@@ -100,6 +100,7 @@ def flush(metrics):
                     msg = "%s returned status %d" % (url, r.status_code)
                     log.error(msg + "; text:")
                     log.error(r.text)
+                    statsd.incr(util.ns('flush', 'response_status', '%d' % r.status_code, settings.suffix_stats))
             except requests.exceptions.RequestException as exc:
                 log.exception("RequestException against %s: %s" % (url, exc))
                 statsd.incr(util.ns('flush', 'errors', settings.suffix_stats))
